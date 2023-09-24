@@ -401,10 +401,10 @@ if [[ MountKopanoAttachments -eq 1 ]]; then
         Write-MLog "" white
     fi
 
-    # test for Kopano attachment store, 10 directories 0..9 must exist, we look for 3 directories
-    # on kopano with db ver 118, there are directories from 00 to ff (there should be 256 dirs)
-    dir_number=$(find /mnt/kopano -mindepth 1 -maxdepth 1 -type d -regextype posix-egrep -regex '/mnt/kopano/[a-f0-9][a-f0-9]?' |wc -l)
-    if [[ $dir_number -lt 3 ]; then
+    # depending on attachment_storage/kopano-server.cfg(5) we should either
+    # have 10 ('files': {0..9}) or 256 ('files_v2': {00..ff}) directories present.
+    dir_number=$(find ${GrommunioMount} -mindepth 1 -maxdepth 1 -type d -regextype posix-egrep -regex ''${GrommunioMount}'([0-9]|[a-f0-9][a-f0-9])' |wc -l)
+    if ! ((dir_number==3 || dir_number==256)) ; then
         echo "$KopanoAttachments resp. $GrommunioMount does not exist. Please check readme on how to setup $0"
         exit 1 # terminate and indicate error
     fi
